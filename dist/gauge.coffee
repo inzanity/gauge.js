@@ -217,6 +217,7 @@ class GaugePointer extends ValueUpdater
 		@options = mergeObjects(@options, options)
 		@length = 2 * @gauge.radius * @gauge.options.radiusScale * @options.length
 		@strokeWidth = @canvas.height * @options.strokeWidth
+		@strokeWidthRad = Math.acos(@strokeWidth / @length)
 		@maxValue = @gauge.maxValue
 		@minValue = @gauge.minValue
 		@animationSpeed =  @gauge.animationSpeed
@@ -228,14 +229,14 @@ class GaugePointer extends ValueUpdater
 	render: () ->
 		angle = @gauge.getAngle.call(@, @displayedValue)
 
-		x = Math.round(@length * Math.cos(angle))
-		y = Math.round(@length * Math.sin(angle))
+		x = @length * Math.cos(angle)
+		y = @length * Math.sin(angle)
 
-		startX = Math.round(@strokeWidth * Math.cos(angle - Math.PI / 2))
-		startY = Math.round(@strokeWidth * Math.sin(angle - Math.PI / 2))
+		startX = @strokeWidth * Math.cos(angle - @strokeWidthRad)
+		startY = @strokeWidth * Math.sin(angle - @strokeWidthRad)
 
-		endX = Math.round(@strokeWidth * Math.cos(angle + Math.PI / 2))
-		endY = Math.round(@strokeWidth * Math.sin(angle + Math.PI / 2))
+		endX = @strokeWidth * Math.cos(angle + @strokeWidthRad)
+		endY = @strokeWidth * Math.sin(angle + @strokeWidthRad)
 
 		@ctx.beginPath()
 		@ctx.fillStyle = @options.color

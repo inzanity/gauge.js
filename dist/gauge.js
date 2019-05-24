@@ -343,6 +343,7 @@
       this.options = mergeObjects(this.options, options);
       this.length = 2 * this.gauge.radius * this.gauge.options.radiusScale * this.options.length;
       this.strokeWidth = this.canvas.height * this.options.strokeWidth;
+      this.strokeWidthRad = Math.acos(this.strokeWidth / this.length);
       this.maxValue = this.gauge.maxValue;
       this.minValue = this.gauge.minValue;
       this.animationSpeed = this.gauge.animationSpeed;
@@ -356,12 +357,12 @@
     GaugePointer.prototype.render = function() {
       var angle, endX, endY, imgX, imgY, startX, startY, x, y;
       angle = this.gauge.getAngle.call(this, this.displayedValue);
-      x = Math.round(this.length * Math.cos(angle));
-      y = Math.round(this.length * Math.sin(angle));
-      startX = Math.round(this.strokeWidth * Math.cos(angle - Math.PI / 2));
-      startY = Math.round(this.strokeWidth * Math.sin(angle - Math.PI / 2));
-      endX = Math.round(this.strokeWidth * Math.cos(angle + Math.PI / 2));
-      endY = Math.round(this.strokeWidth * Math.sin(angle + Math.PI / 2));
+      x = this.length * Math.cos(angle);
+      y = this.length * Math.sin(angle);
+      startX = this.strokeWidth * Math.cos(angle - this.strokeWidthRad);
+      startY = this.strokeWidth * Math.sin(angle - this.strokeWidthRad);
+      endX = this.strokeWidth * Math.cos(angle + this.strokeWidthRad);
+      endY = this.strokeWidth * Math.sin(angle + this.strokeWidthRad);
       this.ctx.beginPath();
       this.ctx.fillStyle = this.options.color;
       this.ctx.arc(0, 0, this.strokeWidth, 0, Math.PI * 2, false);
