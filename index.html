@@ -58,7 +58,8 @@
   	<h4>Options:</h4>
   	<label>Current Val:</label><input type="text" name="currval" min="0" max="3000" step="25" value="1244"><br>
     <label>Anim speed:</label><input type="text" name="animationSpeed" min="1" max="128" step="1" value="32"><br><br>
-    <label>Angle:</label><input id="input-angle" type="text" name="angle" min="-50" max="50" step="1" value="15"><br>
+    <label>Angle:</label><input id="input-angle0" type="text" name="angle0" min="-50" max="50" step="1" value="15"><br>
+    <label>Angle:</label><input id="input-angle1" type="text" name="angle1" min="-50" max="50" step="1" value="15"><br>
     <label>Line width:</label><input id="input-line-width" type="text" name="lineWidth" min="0" max="70" value="44"><br>
     <label>Radius:</label><input id="input-radius-scale" type="text" name="radiusScale" min="50" max="100" value="100"><br>
     <label>Ptr length:</label><input id="input-ptr-len" type="text" name="pointer.length" min="0" max="100" value="60"><br>
@@ -104,7 +105,7 @@
 <h2 id="usage">Usage</h2>
 <pre class="prettyprint">
 var opts = {
-  angle: <span id="opt-angle" class="lit">7</span>, // The span of the gauge arc
+  angle: <span id="opt-angle" class="lit">[7, 7]</span>, // The span of the gauge arc
   lineWidth: <span id="opt-lineWidth" class="lit">5</span>, // The line thickness
   radiusScale: <span id="opt-radiusScale" class="lit">1.0</span>, // Relative radius
   pointer: {
@@ -451,7 +452,11 @@ $.fn.gauge = function(opts) {
       }else if(this.name.indexOf("pointer.strokeWidth") != -1){
         val /= 1000;
       }
-      $('#opt-' + this.name.replace(".", "-")).text(val);
+      if (this.name.indexOf("angle") != -1) {
+        $('#opt-angle').text('[' + $('#input-angle0').val() + ', ' + $('#input-angle1').val() + ']');
+      } else {
+        $('#opt-' + this.name.replace(".", "-")).text(val);
+      }
       if(this.name.indexOf(".") != -1){
       	var elems = this.name.split(".");
       	var tmp_opts = opts;
@@ -481,6 +486,7 @@ $.fn.gauge = function(opts) {
     });
     demoGauge.animationSpeed = opts.animationSpeed;
     opts.generateGradient = true;
+    opts.angle = [opts.angle0, opts.angle1];
     console.log(opts);
     demoGauge.setOptions(opts);
     demoGauge.ctx.clearRect(0, 0, demoGauge.ctx.canvas.width, demoGauge.ctx.canvas.height);
@@ -616,7 +622,8 @@ $.fn.gauge = function(opts) {
           initDonut();
           $("input[name=lineWidth]").val(10);
           $("input[name=fontSize]").val(24);
-          $("input[name=angle]").val(35);
+          $("input[name=angle0]").val(35);
+          $("input[name=angle1]").val(35);
           $("#preview-textfield").removeClass("reset");
           $("input[name=colorStart]").val("6F6EA0")[0].color.importColor();
           $("input[name=colorStop]").val("C0C0DB")[0].color.importColor();
@@ -636,7 +643,8 @@ $.fn.gauge = function(opts) {
           fdSlider.disable('input-ptr-len');
           fdSlider.disable('input-ptr-stroke');
           $("#preview-textfield").removeClass("reset").addClass("reset");
-          $("input[name=angle]").val(-20);
+          $("input[name=angle0]").val(-20);
+          $("input[name=angle1]").val(-20);
           $("input[name=lineWidth]").val(20);
 
           fdSlider.enable('input-ptr-len');
@@ -657,7 +665,8 @@ $.fn.gauge = function(opts) {
         initNew();
         $("input[name=lineWidth]").val(30);
     		$("input[name=fontSize]").val(41);
-        $("input[name=angle]").val(10);
+        $("input[name=angle0]").val(10);
+        $("input[name=angle1]").val(10);
         $("#preview-textfield").removeClass("reset").addClass("reset");
         selectGaguge1.set(1);
         selectGaguge2.set(1);
@@ -667,7 +676,8 @@ $.fn.gauge = function(opts) {
     		initGauge();
     		$("input[name=lineWidth]").val(44);
     		$("input[name=fontSize]").val(41);
-        $("input[name=angle]").val(15);
+        $("input[name=angle0]").val(15);
+        $("input[name=angle1]").val(15);
         $("#preview-textfield").removeClass("reset").addClass("reset");
         
 
@@ -685,7 +695,8 @@ $.fn.gauge = function(opts) {
     	}
     	//fdSlider.updateSlider('input-line-width');
     	fdSlider.updateSlider('input-font-size');
-    	fdSlider.updateSlider('input-angle');
+    	fdSlider.updateSlider('input-angle0');
+    	fdSlider.updateSlider('input-angle1');
     	$("#example").removeClass("donut, gauge").addClass(type);
     	update();
     });

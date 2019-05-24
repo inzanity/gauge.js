@@ -117,8 +117,12 @@ class BaseGauge extends ValueUpdater
 		if @textField
 			@textField.el.style.fontSize = options.fontSize + 'px'
 
-		if @options.angle > .5
-			@options.angle = .5
+		if not (@options.angle instanceof Array)
+			@options.angle = [@options.angle, @options.angle]
+		else if @options.angle.length < 2
+			@options.angle = [@options.angle[0], @options.angle[0]]
+		@options.angle = @options.angle.map (a) -> Math.max(-0.5, Math.min(0.5, a))
+
 		@configDisplayScale()
 		return @
 
@@ -322,8 +326,9 @@ class Gauge extends BaseGauge
 		super(options)
 		@configPercentColors()
 		@extraPadding = 0
-		if @options.angle < 0
-			phi = Math.PI * (1 + @options.angle)
+		angle = Math.min(@options.angle[0], @options.angle[1])
+		if angle < 0
+			phi = Math.PI * (1 + angle)
 			@extraPadding = Math.sin(phi)
 		@availableHeight = @canvas.height * (1 - @paddingTop - @paddingBottom)
 		@lineWidth = @availableHeight * @options.lineWidth # .2 - .7
@@ -391,7 +396,7 @@ class Gauge extends BaseGauge
 		@forceUpdate = false
 
 	getAngle: (value) ->
-		return (1 + @options.angle) * Math.PI + ((value - @minValue) / (@maxValue - @minValue)) * (1 - @options.angle * 2) * Math.PI
+		return (1 + @options.angle[0]) * Math.PI + ((value - @minValue) / (@maxValue - @minValue)) * (1 - (@options.angle[0] + @options.angle[1])) * Math.PI
 
 	getColorForPercentage: (pct, grad) ->
 		if pct == 0
@@ -555,13 +560,13 @@ class Gauge extends BaseGauge
 			@ctx.strokeStyle = fillStyle
 
 			@ctx.beginPath()
-			@ctx.arc(w, h, radius, (1 + @options.angle) * Math.PI, displayedAngle, false)
+			@ctx.arc(w, h, radius, (1 + @options.angle[0]) * Math.PI, displayedAngle, false)
 			@ctx.lineWidth = @lineWidth
 			@ctx.stroke()
 
 			@ctx.strokeStyle = @options.strokeColor
 			@ctx.beginPath()
-			@ctx.arc(w, h, radius, displayedAngle, (2 - @options.angle) * Math.PI, false)
+			@ctx.arc(w, h, radius, displayedAngle, (2 - @options.angle[1]) * Math.PI, false)
 			@ctx.stroke()
 			@ctx.save()
 			@ctx.translate(w, h)
@@ -604,7 +609,7 @@ class BaseDonut extends BaseGauge
 		@render()
 
 	getAngle: (value) ->
-		return (1 - @options.angle) * Math.PI + ((value - @minValue) / (@maxValue - @minValue)) * ((2 + @options.angle) - (1 - @options.angle)) * Math.PI
+		return (1 - @options.angle[0]) * Math.PI + ((value - @minValue) / (@maxValue - @minValue)) * ((2 + @options.angle[1]) - (1 - @options.angle[0])) * Math.PI
 
 	setOptions: (options = null) ->
 		super(options)
@@ -646,14 +651,14 @@ class BaseDonut extends BaseGauge
 
 		@ctx.strokeStyle = @options.strokeColor
 		@ctx.beginPath()
-		@ctx.arc(w, h, @radius, (1 - @options.angle) * Math.PI, (2 + @options.angle) * Math.PI, false)
+		@ctx.arc(w, h, @radius, (1 - @options.angle[0]) * Math.PI, (2 + @options.angle[1]) * Math.PI, false)
 		@ctx.lineWidth = @lineWidth
 		@ctx.lineCap = "round"
 		@ctx.stroke()
 
 		@ctx.strokeStyle = grdFill
 		@ctx.beginPath()
-		@ctx.arc(w, h, @radius, (1 - @options.angle) * Math.PI, displayedAngle, false)
+		@ctx.arc(w, h, @radius, (1 - @options.angle[0]) * Math.PI, displayedAngle, false)
 		@ctx.stroke()
 
 

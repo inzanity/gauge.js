@@ -195,9 +195,14 @@
       if (this.textField) {
         this.textField.el.style.fontSize = options.fontSize + 'px';
       }
-      if (this.options.angle > .5) {
-        this.options.angle = .5;
+      if (!(this.options.angle instanceof Array)) {
+        this.options.angle = [this.options.angle, this.options.angle];
+      } else if (this.options.angle.length < 2) {
+        this.options.angle = [this.options.angle[0], this.options.angle[0]];
       }
+      this.options.angle = this.options.angle.map(function(a) {
+        return Math.max(-0.5, Math.min(0.5, a));
+      });
       this.configDisplayScale();
       return this;
     };
@@ -474,15 +479,16 @@
     }
 
     Gauge.prototype.setOptions = function(options) {
-      var gauge, j, len, phi, ref;
+      var angle, gauge, j, len, phi, ref;
       if (options == null) {
         options = null;
       }
       Gauge.__super__.setOptions.call(this, options);
       this.configPercentColors();
       this.extraPadding = 0;
-      if (this.options.angle < 0) {
-        phi = Math.PI * (1 + this.options.angle);
+      angle = Math.min(this.options.angle[0], this.options.angle[1]);
+      if (angle < 0) {
+        phi = Math.PI * (1 + angle);
         this.extraPadding = Math.sin(phi);
       }
       this.availableHeight = this.canvas.height * (1 - this.paddingTop - this.paddingBottom);
@@ -569,7 +575,7 @@
     };
 
     Gauge.prototype.getAngle = function(value) {
-      return (1 + this.options.angle) * Math.PI + ((value - this.minValue) / (this.maxValue - this.minValue)) * (1 - this.options.angle * 2) * Math.PI;
+      return (1 + this.options.angle[0]) * Math.PI + ((value - this.minValue) / (this.maxValue - this.minValue)) * (1 - (this.options.angle[0] + this.options.angle[1])) * Math.PI;
     };
 
     Gauge.prototype.getColorForPercentage = function(pct, grad) {
@@ -754,12 +760,12 @@
         }
         this.ctx.strokeStyle = fillStyle;
         this.ctx.beginPath();
-        this.ctx.arc(w, h, radius, (1 + this.options.angle) * Math.PI, displayedAngle, false);
+        this.ctx.arc(w, h, radius, (1 + this.options.angle[0]) * Math.PI, displayedAngle, false);
         this.ctx.lineWidth = this.lineWidth;
         this.ctx.stroke();
         this.ctx.strokeStyle = this.options.strokeColor;
         this.ctx.beginPath();
-        this.ctx.arc(w, h, radius, displayedAngle, (2 - this.options.angle) * Math.PI, false);
+        this.ctx.arc(w, h, radius, displayedAngle, (2 - this.options.angle[1]) * Math.PI, false);
         this.ctx.stroke();
         this.ctx.save();
         this.ctx.translate(w, h);
@@ -816,7 +822,7 @@
     }
 
     BaseDonut.prototype.getAngle = function(value) {
-      return (1 - this.options.angle) * Math.PI + ((value - this.minValue) / (this.maxValue - this.minValue)) * ((2 + this.options.angle) - (1 - this.options.angle)) * Math.PI;
+      return (1 - this.options.angle[0]) * Math.PI + ((value - this.minValue) / (this.maxValue - this.minValue)) * ((2 + this.options.angle[1]) - (1 - this.options.angle[0])) * Math.PI;
     };
 
     BaseDonut.prototype.setOptions = function(options) {
@@ -864,13 +870,13 @@
       stop = this.radius + this.lineWidth / 2;
       this.ctx.strokeStyle = this.options.strokeColor;
       this.ctx.beginPath();
-      this.ctx.arc(w, h, this.radius, (1 - this.options.angle) * Math.PI, (2 + this.options.angle) * Math.PI, false);
+      this.ctx.arc(w, h, this.radius, (1 - this.options.angle[0]) * Math.PI, (2 + this.options.angle[1]) * Math.PI, false);
       this.ctx.lineWidth = this.lineWidth;
       this.ctx.lineCap = "round";
       this.ctx.stroke();
       this.ctx.strokeStyle = grdFill;
       this.ctx.beginPath();
-      this.ctx.arc(w, h, this.radius, (1 - this.options.angle) * Math.PI, displayedAngle, false);
+      this.ctx.arc(w, h, this.radius, (1 - this.options.angle[0]) * Math.PI, displayedAngle, false);
       return this.ctx.stroke();
     };
 
